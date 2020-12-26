@@ -39,12 +39,10 @@ This project is the brick of another upcoming project. Indeed, we are motivated 
 
 We are mainly interested in retrieving information that could be relevant when creating such a system which explains why we decided not to retrieve some types of information from MyDramaList.
 
-Please note that only data from **drama** are being retrieved, movies are (at least for now) ignored by the spider.
-
 ## To do
 
 - [ ] Add a requirements.txt file
-- [ ] Add docstrings
+- [x] Add docstrings
 - [ ] Implement some user arguments :
     - [ ] Maximum pages to scrape
     - [ ] Minimum rating
