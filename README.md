@@ -8,7 +8,7 @@ To run the spider, first install the dependencies running :
 
 `pip install -r requirements.txt`
 
-Then, navigate through the the scrapy project located in the root directory and from there, you can very simply run the Scrapy spider by running : 
+Then, navigate through the the scrapy project called dramascraper which is located in the root directory and from there, you can very simply run the spider by running : 
 
 `scrapy crawl dramascraper`
 
@@ -35,9 +35,9 @@ Then, navigate through the the scrapy project located in the root directory and 
 
 ## Motivation
 
-This project is the brick of another project. Indeed, we are motivated in scraping information on MyDramaList so that we can later create a drama recommandation system based on the user's taste in terms of drama. 
+This project is the brick of another upcoming project. Indeed, we are motivated in scraping information on MyDramaList so that we can later create a **drama recommandation system** based on the user's taste in terms of drama. 
 
-We are firstly interested in retrieving information that could be relevant when creating such a system which explains why we decided not to retrieve some types of information from the website.
+We are mainly interested in retrieving information that could be relevant when creating such a system which explains why we decided not to retrieve some types of information from MyDramaList.
 
 Please note that only data from **drama** are being retrieved, movies are (at least for now) ignored by the spider.
 
@@ -54,4 +54,4 @@ Please note that only data from **drama** are being retrieved, movies are (at le
 
 ## Contact
 
-If there is some missing information that you would be interested in retrieving through the spiders, please send me an e-mail at jordan.vuong96@gmail.com.
+If there is any missing information that you would be interested in retrieving through the spiders, please send me an e-mail at jordan.vuong96@gmail.com.
