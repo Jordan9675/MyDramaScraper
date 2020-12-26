@@ -267,7 +267,7 @@ class DramalistSpider(scrapy.Spider):
             "country_origin": self.get_country_origin(response),
             "ratings": self.get_user_rating(response),
             "ranking": self.get_ranking(response),
-            "popularity": self.get_popularity(response),
+            "popularity_rank": self.get_popularity(response),
             "nb_watchers": self.get_nb_watchers(response),
             "nb_ratings": self.get_nb_rating(response),
             "nb_reviews": self.get_nb_reviews(response),
