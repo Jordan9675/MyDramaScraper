@@ -489,7 +489,6 @@ class DramalistSpider(scrapy.Spider):
             yield scrapy.Request(url, headers=self.headers,
                                 callback=self.parse_main_tab)
 
-
     def parse_main_tab(self, response):
         """
         Callback method used within 'scrap' that retrieves all the information
@@ -504,12 +503,6 @@ class DramalistSpider(scrapy.Spider):
         Yields:
             scrapy.Request: Scrapy Request to the cast tab.
         """
-        
-        try:
-            self.check_drama(response)
-        except NonDrama:
-            return None
-            
         data = {
             "name": self.get_drama_name(response),
             "synopsis": self.get_drama_synopsis(response),
@@ -554,22 +547,3 @@ class DramalistSpider(scrapy.Spider):
         main_tab_data["casting"] = casting
 
         yield main_tab_data
-
-    def check_drama(self, response):
-
-        xpath = "//div[@class='box clear hidden-sm-down'][descendant::h3" \
-                "[contains(., 'Details')]]//li[@class='list-item p-a-0']/b/text()"
-        _type = response.xpath(xpath).get()
-        _type = _type.replace(":", "")
-
-        if _type != "Drama":
-            message = f"Excluding the entry (url : {response.url}) as it is of " \
-                        f"type '{_type}' instead of 'Drama'"
-            raise NonDrama(message)
-
-class NonDrama(Exception):
-
-    def __init__(self, message):
-        self.message = message
-
-    
