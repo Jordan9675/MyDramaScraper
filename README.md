@@ -49,6 +49,7 @@ We are mainly interested in retrieving information that could be relevant when c
     - [ ] Date range
 - [ ] Scrape information located in the statistics tab of the drama's page
 - [ ] Creating a spider to retrieve information about the actors
+- [ ] Implement a pipeline to allow insertion into MySQL databases
 
 ## Contact
 
