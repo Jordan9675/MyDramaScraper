@@ -23,8 +23,6 @@ class InsertItem:
         """
         Create a connection to the database
         """
-        print("ATTATION")
-        print(os.getenv("HOST"), os.getenv("USERNAME"))
         self.db = mysql.connector.connect(
             host=os.getenv("HOST"),
             user=os.getenv("USERNAME"),
