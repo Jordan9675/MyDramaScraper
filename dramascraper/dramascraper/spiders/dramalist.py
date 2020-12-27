@@ -537,13 +537,10 @@ class DramalistSpider(scrapy.Spider):
             the type of role (main, support, guest)
         """
         main_tab_data = response.meta["data"]
-        casting = {
-            "screenwriter": self.get_screenwriter(response),
-            "director": self.get_director(response),
-            "main_roles": self.get_main_roles(response),
-            "support_roles": self.get_support_roles(response),
-            "guest_roles": self.get_guest_roles(response)
-        }
-        main_tab_data["casting"] = casting
+        main_tab_data["screenwriter"] = self.get_screenwriter(response)
+        main_tab_data["director"] = self.get_director(response)
+        main_tab_data["main_roles"] = self.get_main_roles(response),
+        main_tab_data["support_roles"] = self.get_support_roles(response)
+        main_tab_data["guest_roles"] = self.get_guest_roles(response)
 
         yield main_tab_data
