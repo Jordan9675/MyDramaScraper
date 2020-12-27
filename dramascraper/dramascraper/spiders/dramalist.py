@@ -434,7 +434,7 @@ class DramalistSpider(scrapy.Spider):
         """
         xpath = "//ul[preceding-sibling::h3[1][contains(., 'Screenwriter')]]/li//a" \
                 "[@class='text-primary text-ellipsis' and contains(@href, 'people')]/b/text()"
-        screenwriter = response.xpath(xpath).get()
+        screenwriter = response.xpath(xpath).getall()
 
         return screenwriter
 
@@ -451,7 +451,7 @@ class DramalistSpider(scrapy.Spider):
         """
         xpath = "//ul[preceding-sibling::h3[1][contains(., 'Screenwriter')]]/li//a" \
                 "[@class='text-primary text-ellipsis' and contains(@href, 'people')]/b/text()"
-        director = response.xpath(xpath).get()
+        director = response.xpath(xpath).getall()
 
         return director
 
