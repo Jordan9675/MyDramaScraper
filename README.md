@@ -31,8 +31,8 @@ Then, navigate through the the scrapy project called dramascraper which is locat
 | genres              	| List       	| List of genres associated to the drama                     	|
 | tags                	| List       	| List of tags associated to the drama                       	|
 | mydramalist_url     	| String     	| URL of the drama on MyDramaList                            	|
-| director             	| String 	    | Name of the drama's director        	                        |
-| screenwriter          | String 	    | Name of the drama's screenwriter                              |
+| director             	| List 	        | List of the drama's director(s)      	                        |
+| screenwriter          | List 	        | List of the drama's screenwriter(s)                           |
 | main_roles            | List 	        | List of the actors having a main role in the drama          	|
 | support_roles         | List 	        | List of the actors having a support role in the drama         |
 | guest_roles           | List 	        | List of the actors having a guest role in the drama        	|
