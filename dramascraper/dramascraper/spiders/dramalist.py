@@ -1,3 +1,4 @@
+import logging
 import re
 
 import nltk
@@ -7,24 +8,21 @@ from fake_useragent import UserAgent
 
 class DramalistSpider(scrapy.Spider):
     name = 'dramalist'
-    custom_settings = {
-        'FEEDS': {
-            'drama.json': {
-            'format': 'json',
-            'encoding': 'utf8',
-            'indent': 4
-            }
-        },
-        'LOG_LEVEL': "INFO",
-        "LOG_FILE": "drama.log"
-    }
 
-    def __init__(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         # Generating fake user agent that will be included in the headers
         ua = UserAgent()
         user_agent = ua.chrome
         self.headers = {"user-agent": user_agent}
-    
+        # Setting an instance variable that enables/disables the insert Pipeline
+        if "sql" in kwargs.keys() and kwargs["sql"]:
+            logging.info("Insertion in MySQL enabled")
+            self.sql = True
+        else:
+            logging.info("Insertion in MySQL disabled")
+            self.sql = False
+
     def start_requests(self):
         """
         Method that is called after opening the spider. Navigating to the first
@@ -53,9 +51,9 @@ class DramalistSpider(scrapy.Spider):
         MAX_PAGES = self.get_max_page(response)
         for i in range(1, MAX_PAGES + 1):
             url = "https://mydramalist.com/shows/top?page=" + str(i)
-            yield scrapy.Request(url, headers=self.headers, 
-                                callback=self.scrap)
-    
+            yield scrapy.Request(url, headers=self.headers,
+                                 callback=self.scrap)
+
     def get_max_page(self, response):
         """
         Method allowing us to determiner the maximum pages to scrape
@@ -70,7 +68,7 @@ class DramalistSpider(scrapy.Spider):
         max_page = response.css(".last > a::attr(href)").get()
         max_page = re.search(r"page=(\d+)", max_page).group(1)
         max_page = int(max_page)
-        
+
         return max_page
 
     def get_drama_name(self, response):
@@ -471,7 +469,7 @@ class DramalistSpider(scrapy.Spider):
         urls = ["https://mydramalist.com" + x for x in urls]
 
         return urls
-    
+
     def scrap(self, response):
         """
         Callback method used when requesting one of the top show's page
@@ -487,7 +485,7 @@ class DramalistSpider(scrapy.Spider):
 
         for url in urls:
             yield scrapy.Request(url, headers=self.headers,
-                                callback=self.parse_main_tab)
+                                 callback=self.parse_main_tab)
 
     def parse_main_tab(self, response):
         """
@@ -539,7 +537,7 @@ class DramalistSpider(scrapy.Spider):
         main_tab_data = response.meta["data"]
         main_tab_data["screenwriter"] = self.get_screenwriter(response)
         main_tab_data["director"] = self.get_director(response)
-        main_tab_data["main_roles"] = self.get_main_roles(response),
+        main_tab_data["main_roles"] = self.get_main_roles(response)
         main_tab_data["support_roles"] = self.get_support_roles(response)
         main_tab_data["guest_roles"] = self.get_guest_roles(response)
 
