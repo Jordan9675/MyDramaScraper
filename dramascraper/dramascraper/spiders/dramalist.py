@@ -449,7 +449,7 @@ class DramalistSpider(scrapy.Spider):
         Returns:
             str: name of the director
         """
-        xpath = "//ul[preceding-sibling::h3[1][contains(., 'Screenwriter')]]/li//a" \
+        xpath = "//ul[preceding-sibling::h3[1][contains(., 'Director')]]/li//a" \
                 "[@class='text-primary text-ellipsis' and contains(@href, 'people')]/b/text()"
         director = response.xpath(xpath).getall()
 
