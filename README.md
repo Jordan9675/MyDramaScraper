@@ -101,7 +101,7 @@ We are mainly interested in retrieving information that could be relevant when c
 
 ## To do
 
-- [ ] Add a requirements.txt file
+- [x] Add a requirements.txt file
 - [x] Add docstrings
 - [ ] Implement some user arguments :
     - [ ] Maximum pages to scrape
