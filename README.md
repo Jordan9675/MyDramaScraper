@@ -2,17 +2,29 @@
 
 This repository provides a classic Scrapy project with a spider named **dramascraper** which allows one to scrap information about the dramas that are listed on [MyDramaList](https://mydramalist.com/).
 
+It also allows to scrap the list of drama a user **completed** and their associated ratings
+
 ## Quick start
 
 To run the spider, first install the dependencies running : 
 
 `pip install -r requirements.txt`
 
-Then, navigate through the the scrapy project called dramascraper which is located in the root directory and from there, you can very simply run the spider by running : 
+Then, navigate through the the scrapy project called dramascraper which is located in the root directory and from there
+
+You can either scrape MyDramaList's list of drama by running :  
 
 `scrapy crawl dramascraper`
 
+To scrape data about user's list, you can run : 
+
+`scrapy crawl userdramalist -a "<user1>,<user2>...<userN>"`
+
+*Note : List of users must be comma separated and enclosed in double quotes. A single user can also be passed.*
+
 ## Data types
+
+### Drama information
 
 | Key                 	| Type       	| Description                                                	|
 |---------------------	|------------	|------------------------------------------------------------	|
@@ -37,7 +49,17 @@ Then, navigate through the the scrapy project called dramascraper which is locat
 | support_roles         | List 	        | List of the actors having a support role in the drama         |
 | guest_roles           | List 	        | List of the actors having a guest role in the drama        	|
 
+### User's drama list
+
+| Key                 	| Type       	| Description                                                	|
+|---------------------	|------------	|------------------------------------------------------------	|
+| title                	| str     	| Title of the drama                                          	|
+| user            	| str     	| User's username                                    	|
+| score            	| int     	| Rating given by the user to the drama                                      	|
+
 ## Insert in MySQL
+
+This feature is only available when using the spider designed to scrape information about dramas.
 
 This scrapy project comes with a pipeline allowing to insert the results in a MySQL database. 
 
