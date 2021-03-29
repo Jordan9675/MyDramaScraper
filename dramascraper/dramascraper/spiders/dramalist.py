@@ -16,7 +16,7 @@ class DramalistSpider(scrapy.Spider):
         user_agent = ua.chrome
         self.headers = {"user-agent": user_agent}
         # Setting an instance variable that enables/disables the insert Pipeline
-        if "sql" in kwargs.keys() and kwargs["sql"]:
+        if "sql" in kwargs.keys() and kwargs["sql"].lower() == "true":
             logging.info("Insertion in MySQL enabled")
             self.sql = True
         else:

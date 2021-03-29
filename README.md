@@ -76,7 +76,7 @@ To do so, you could run something like :
 
 `scrapy crawl dramalist -a sql=True`
 
-> Please note that here, the value of the sql argument is True but could be whatever as long as it is not an empty string.
+*Note: The value of the sql argument is case insensitive*
 
 ### What columns should I create in my DB ?
 
