@@ -1,8 +1,8 @@
 # MyDramaScraper
 
-This repository provides a classic Scrapy project with a spider named **dramascraper** which allows one to scrap information about the dramas that are listed on [MyDramaList](https://mydramalist.com/).
+This repository provides a classic Scrapy project with a spider named **dramalist** which allows one to scrap information about the dramas that are listed on [MyDramaList](https://mydramalist.com/).
 
-It also allows to scrap the list of drama a user **completed** and their associated ratings
+It also allows to scrap the list of dramas a user **completed** and their associated ratings
 
 ## Quick start
 
@@ -14,7 +14,7 @@ Then, navigate through the the scrapy project called dramascraper which is locat
 
 You can either scrape MyDramaList's list of drama by running :  
 
-`scrapy crawl dramascraper`
+`scrapy crawl dramalist`
 
 To scrape data about user's list, you can run : 
 
