@@ -15,9 +15,7 @@ class UserdramalistSpider(scrapy.Spider):
     def generate_user_agent(self):
         ua = UserAgent()
         user_agent = ua.chrome
-        headers = {"user-agent": user_agent}
-
-        return headers
+        return {"user-agent": user_agent}
     
     def retrieve_user_arguments(self, **kwargs):
         if "users" in kwargs:
@@ -45,8 +43,7 @@ class UserdramalistSpider(scrapy.Spider):
             yield data
 
     def get_title(self, selector):
-        title = selector.css(".title.text-primary span::text").get()
-        return title
+        return selector.css(".title.text-primary span::text").get()
 
     def get_score(self, selector):
         score = selector.css(".score::text").get()

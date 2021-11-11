@@ -1,13 +1,13 @@
 import logging
 import re
 
-import nltk
 import scrapy
 from fake_useragent import UserAgent
 
 
 class DramalistSpider(scrapy.Spider):
     name = 'dramalist'
+    MAX_PAGES = 250
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -16,7 +16,7 @@ class DramalistSpider(scrapy.Spider):
         user_agent = ua.chrome
         self.headers = {"user-agent": user_agent}
         # Setting an instance variable that enables/disables the insert Pipeline
-        if "sql" in kwargs.keys() and kwargs["sql"].lower() == "true":
+        if kwargs.get("sql", "").lower() == "true":
             logging.info("Insertion in MySQL enabled")
             self.sql = True
         else:
@@ -24,18 +24,6 @@ class DramalistSpider(scrapy.Spider):
             self.sql = False
 
     def start_requests(self):
-        """
-        Method that is called after opening the spider. Navigating to the first
-        page of the top shows.
-
-        Yields:
-            scrapy.Request: Scrapy request made to the first page of top shows
-        """
-        start_url = "https://mydramalist.com/shows/top"
-
-        yield scrapy.Request(start_url, headers=self.headers, callback=self.parse)
-
-    def parse(self, response):
         """
         Method used as a callback to the scrapy Request sent within the
         start_requests method. Through this method, we navigate through all the
@@ -48,28 +36,10 @@ class DramalistSpider(scrapy.Spider):
         Yields:
             scrapy.Request: Request made to each page of the top shows.
         """
-        MAX_PAGES = self.get_max_page(response)
-        for i in range(1, MAX_PAGES + 1):
+        for i in range(1, self.MAX_PAGES + 1):
             url = "https://mydramalist.com/shows/top?page=" + str(i)
             yield scrapy.Request(url, headers=self.headers,
                                  callback=self.scrap)
-
-    def get_max_page(self, response):
-        """
-        Method allowing us to determiner the maximum pages to scrape
-
-        Args:
-            response (scrapy.http.response): Response from the first page of 
-            the top shows
-
-        Returns:
-            int: Maximum number of pages
-        """
-        max_page = response.css(".last > a::attr(href)").get()
-        max_page = re.search(r"page=(\d+)", max_page).group(1)
-        max_page = int(max_page)
-
-        return max_page
 
     def get_drama_name(self, response):
         """
@@ -133,12 +103,10 @@ class DramalistSpider(scrapy.Spider):
             float: Drama's rating. Equals to None if not existing.
         """
         rating = response.css(".deep-orange::text").get()
-        if rating != "N/A":
-            rating = float(rating)
-        else:
-            rating = None
-
-        return rating
+        try:
+            return float(rating)
+        except ValueError:
+            return None
 
     def get_nb_rating(self, response):
         """
@@ -203,9 +171,8 @@ class DramalistSpider(scrapy.Spider):
 
         initial_nb_minutes = re.search(r"(\d*) min\.", duration).group(1)
         initial_nb_minutes = int(initial_nb_minutes)
-        total_nb_minutes = hours_to_minute + initial_nb_minutes
 
-        return total_nb_minutes
+        return hours_to_minute + initial_nb_minutes
 
     def get_duration(self, response):
         """
@@ -218,8 +185,10 @@ class DramalistSpider(scrapy.Spider):
         Returns:
             int: Duration of an episode in minutes
         """
-
-        xpath = "//li[@class='list-item p-a-0'][child::b[@class='inline duration']]/text()"
+        xpath = (
+            "//li[@class='list-item p-a-0']"
+            "[child::b[@class='inline duration']]/text()"
+        )
         duration = response.xpath(xpath).get()
         if duration is not None:
             duration = self.duration_to_minutes(duration)
@@ -237,11 +206,13 @@ class DramalistSpider(scrapy.Spider):
         Returns:
             int: number of episodes
         """
-        xpath = "//li[@class='list-item p-a-0'][child::b[contains(., 'Episodes')]]/text()"
+        xpath = (
+            "//li[@class='list-item p-a-0']"
+            "[child::b[contains(., 'Episodes')]]/text()"
+        )
         nb_episodes = response.xpath(xpath).get()
-        nb_episodes = int(nb_episodes)
 
-        return nb_episodes
+        return int(nb_episodes)
 
     def get_country_origin(self, response):
         """
@@ -254,11 +225,12 @@ class DramalistSpider(scrapy.Spider):
         Returns:
             str: Country of origin
         """
+        xpath = (
+            "//li[@class='list-item p-a-0']"
+            "[child::b[contains(., 'Country')]]/text()"
+        )
 
-        xpath = "//li[@class='list-item p-a-0'][child::b[contains(., 'Country')]]/text()"
-        country = response.xpath(xpath).get().strip()
-
-        return country
+        return response.xpath(xpath).get().strip()
 
     def get_ranking(self, response):
         """
@@ -272,12 +244,14 @@ class DramalistSpider(scrapy.Spider):
             int: Rank of the drama on MyDramaList
         """
 
-        xpath = "//li[@class='list-item p-a-0'][child::b[contains(., 'Ranked')]]/text()"
+        xpath = (
+            "//li[@class='list-item p-a-0']"
+            "[child::b[contains(., 'Ranked')]]/text()"
+        )
         ranking = response.xpath(xpath).get().strip()
         ranking = ranking.replace("#", "")
-        ranking = int(ranking)
 
-        return ranking
+        return int(ranking)
 
     def get_popularity(self, response):
         """
@@ -290,12 +264,14 @@ class DramalistSpider(scrapy.Spider):
         Returns:
             int: Popularity rank
         """
-        xpath = "//li[@class='list-item p-a-0'][child::b[contains(., 'Popularity')]]/text()"
+        xpath = (
+            "//li[@class='list-item p-a-0']"
+            "[child::b[contains(., 'Popularity')]]/text()"
+        )
         popularity = response.xpath(xpath).get().strip()
         popularity = popularity.replace("#", "")
-        popularity = int(popularity)
 
-        return popularity
+        return int(popularity)
 
     def get_nb_watchers(self, response):
         """
@@ -308,12 +284,14 @@ class DramalistSpider(scrapy.Spider):
         Returns:
             int: number of watchers
         """
-        xpath = "//li[@class='list-item p-a-0'][child::b[contains(., 'Watchers')]]/text()"
+        xpath = (
+            "//li[@class='list-item p-a-0']"
+            "[child::b[contains(., 'Watchers')]]/text()"
+        )
         nb_watchers = response.xpath(xpath).get().strip()
         nb_watchers = nb_watchers.replace(",", "")
-        nb_watchers = int(nb_watchers)
 
-        return nb_watchers
+        return int(nb_watchers)
 
     def get_streaming_platform(self, response):
         """
@@ -326,13 +304,14 @@ class DramalistSpider(scrapy.Spider):
         Returns:
             list: list of platforms
         """
-        container_xpath = "//div[@class='box'][descendant::h3[contains" \
-            "(., 'Where to Watch')]]"
+        container_xpath = (
+            "//div[@class='box']"
+            "[descendant::h3[contains(., 'Where to Watch')]]"
+        )
         platforms_xpath = ".//a[@class='text-primary']/b/text()"
         container = response.xpath(container_xpath)
-        platforms = container.xpath(platforms_xpath).getall()
-
-        return platforms
+        
+        return container.xpath(platforms_xpath).getall()
 
     def get_genres(self, response):
         """
@@ -345,11 +324,11 @@ class DramalistSpider(scrapy.Spider):
         Returns:
             list: list of genres
         """
-        xpath = "//li[@class='list-item p-a-0 show-genres'][child::b" \
+        xpath = (
+            "//li[@class='list-item p-a-0 show-genres'][child::b"
             "[contains(., 'Genres')]]/a/text()"
-        genres = response.xpath(xpath).getall()
-
-        return genres
+        )
+        return response.xpath(xpath).getall()
 
     def get_tags(self, response):
         """
@@ -362,11 +341,12 @@ class DramalistSpider(scrapy.Spider):
         Returns:
             list: list of tags
         """
-        xpath = "//li[@class='list-item p-a-0 show-tags'][child::b" \
+        xpath = (
+            "//li[@class='list-item p-a-0 show-tags'][child::b"
             "[contains(., 'Tags')]]/span/a/text()"
-        tags = response.xpath(xpath).getall()
+        )
 
-        return tags
+        return response.xpath(xpath).getall()
 
     def get_main_roles(self, response):
         """
@@ -379,11 +359,12 @@ class DramalistSpider(scrapy.Spider):
         Returns:
             list: list of actors
         """
-        xpath = "//ul[preceding-sibling::h3[1][contains(., 'Main Role')]]/li//a" \
-                "[@class='text-primary' and contains(@href, 'people')]/b/text()"
-        main_roles = response.xpath(xpath).getall()
+        xpath = (
+            "//ul[preceding-sibling::h3[1][contains(., 'Main Role')]]/li//a" 
+            "[@class='text-primary' and contains(@href, 'people')]/b/text()"
+        )
 
-        return main_roles
+        return response.xpath(xpath).getall()
 
     def get_support_roles(self, response):
         """
@@ -396,11 +377,12 @@ class DramalistSpider(scrapy.Spider):
         Returns:
             list: list of actors
         """
-        xpath = "//ul[preceding-sibling::h3[1][contains(., 'Support Role')]]/li//a" \
-                "[@class='text-primary' and contains(@href, 'people')]/b/text()"
-        support_roles = response.xpath(xpath).getall()
+        xpath = (
+            "//ul[preceding-sibling::h3[1][contains(., 'Support Role')]]/li//a"
+            "[@class='text-primary' and contains(@href, 'people')]/b/text()"
+        )
 
-        return support_roles
+        return response.xpath(xpath).getall()
 
     def get_guest_roles(self, response):
         """
@@ -413,11 +395,12 @@ class DramalistSpider(scrapy.Spider):
         Returns:
             list: list of actors
         """
-        xpath = "//ul[preceding-sibling::h3[1][contains(., 'Guest Role')]]/li//a" \
-                "[@class='text-primary' and contains(@href, 'people')]/b/text()"
-        guest_roles = response.xpath(xpath).getall()
+        xpath = (
+            "//ul[preceding-sibling::h3[1][contains(., 'Guest Role')]]/li//a"
+            "[@class='text-primary' and contains(@href, 'people')]/b/text()"
+        )
 
-        return guest_roles
+        return response.xpath(xpath).getall()
 
     def get_screenwriter(self, response):
         """
@@ -430,11 +413,13 @@ class DramalistSpider(scrapy.Spider):
         Returns:
             str: name of the screenwriter
         """
-        xpath = "//ul[preceding-sibling::h3[1][contains(., 'Screenwriter')]]/li//a" \
-                "[@class='text-primary text-ellipsis' and contains(@href, 'people')]/b/text()"
-        screenwriter = response.xpath(xpath).getall()
+        xpath = (
+            "//ul[preceding-sibling::h3[1][contains(., 'Screenwriter')]]/li//a"
+            "[@class='text-primary text-ellipsis' and "
+            "contains(@href, 'people')]/b/text()"
+        )
 
-        return screenwriter
+        return response.xpath(xpath).getall()
 
     def get_director(self, response):
         """
@@ -447,11 +432,13 @@ class DramalistSpider(scrapy.Spider):
         Returns:
             str: name of the director
         """
-        xpath = "//ul[preceding-sibling::h3[1][contains(., 'Director')]]/li//a" \
-                "[@class='text-primary text-ellipsis' and contains(@href, 'people')]/b/text()"
-        director = response.xpath(xpath).getall()
+        xpath = (
+            "//ul[preceding-sibling::h3[1][contains(., 'Director')]]/li//a"
+            "[@class='text-primary text-ellipsis' and "
+            "contains(@href, 'people')]/b/text()"
+        )
 
-        return director
+        return response.xpath(xpath).getall()
 
     def get_urls(self, response):
         """
@@ -466,9 +453,8 @@ class DramalistSpider(scrapy.Spider):
             list: list of urls
         """
         urls = response.css(".text-primary.title > a::attr(href)").getall()
-        urls = ["https://mydramalist.com" + x for x in urls]
 
-        return urls
+        return ["https://mydramalist.com" + x for x in urls]
 
     def scrap(self, response):
         """
@@ -484,8 +470,10 @@ class DramalistSpider(scrapy.Spider):
         urls = self.get_urls(response)
 
         for url in urls:
-            yield scrapy.Request(url, headers=self.headers,
-                                 callback=self.parse_main_tab)
+            yield scrapy.Request(
+                url, 
+                headers=self.headers,
+                callback=self.parse_main_tab)
 
     def parse_main_tab(self, response):
         """
